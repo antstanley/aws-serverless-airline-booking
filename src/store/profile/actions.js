@@ -41,21 +41,19 @@ import { Auth } from "aws-amplify";
  *    next();
  * });
  */
-export function getSession({ commit, getters }) {
-  return new Promise((resolve, reject) => {
-    Auth.currentAuthenticatedUser()
-      .then(user => {
-        if (!getters.isAuthenticated) {
-          commit("SET_USER", user);
-        }
-        resolve();
-      })
-      .catch(err => {
-        console.log(err);
-        if (getters.isAuthenticated) {
-          commit("SET_USER");
-        }
-        reject();
-      });
-  });
+export async function getSession({ commit, getters }) {
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    if (!getters.isAuthenticated) {
+      commit("SET_USER", user);
+    }
+    return;
+  } catch (err) {
+    console.log(err);
+    if (getters.isAuthenticated) {
+      commit("SET_USER");
+    }
+
+    throw err;
+  }
 }

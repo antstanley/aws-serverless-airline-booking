@@ -28,31 +28,27 @@ import axios from "axios";
  *    ...mapGetters("profile", ["isAuthenticated"])
  * }
  */
-export function fetchBooking({ commit }) {
-  return new Promise(async (resolve, reject) => {
-    Loading.show({
-      message: "Loading bookings..."
-    });
-
-    try {
-      const { data: bookingData } = await axios.get("/mocks/bookings.json");
-      const bookings = bookingData.map(booking => new Booking(booking));
-      bookings.map(booking => {
-        booking.inboundFlight = new Flight(booking.inboundFlight);
-        booking.outboundFlight = new Flight(booking.outboundFlight);
-
-        return booking;
-      });
-
-      commit("SET_BOOKINGS", bookings);
-
-      resolve();
-      Loading.hide();
-    } catch (err) {
-      console.error(err);
-      reject(err);
-    }
+export async function fetchBooking({ commit }) {
+  Loading.show({
+    message: "Loading bookings..."
   });
+
+  try {
+    const { data: bookingData } = await axios.get("/mocks/bookings.json");
+    const bookings = bookingData.map(booking => new Booking(booking));
+    bookings.map(booking => {
+      booking.inboundFlight = new Flight(booking.inboundFlight);
+      booking.outboundFlight = new Flight(booking.outboundFlight);
+
+      return booking;
+    });
+    commit("SET_BOOKINGS", bookings);
+    return;
+    Loading.hide();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 /**

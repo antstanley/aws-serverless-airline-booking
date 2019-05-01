@@ -21,23 +21,19 @@ import { Loading } from "quasar";
  *    }
  * }
  */
-export function fetchLoyalty({ commit }) {
-  return new Promise(async (resolve, reject) => {
-    Loading.show({
-      message: "Loading profile..."
-    });
-
-    try {
-      const { data: loyaltyData } = await axios.get("/mocks/loyalty.json");
-      const loyalty = new Loyalty(loyaltyData);
-
-      commit("SET_LOYALTY", loyalty);
-
-      Loading.hide();
-      resolve();
-    } catch (err) {
-      Loading.hide();
-      reject(err);
-    }
+export async function fetchLoyalty({ commit }) {
+  Loading.show({
+    message: "Loading profile..."
   });
+
+  try {
+    const { data: loyaltyData } = await axios.get("/mocks/loyalty.json");
+    const loyalty = new Loyalty(loyaltyData);
+    commit("SET_LOYALTY", loyalty);
+    Loading.hide();
+    return;
+  } catch (err) {
+    Loading.hide();
+    throw err;
+  }
 }

@@ -30,22 +30,19 @@ import axios from "axios";
  *    this.filteredFlights = this.sortByDeparture(this.flights);
  * }
  */
-export function fetchFlights({ commit }, { date, departure, arrival }) {
-  return new Promise(async (resolve, reject) => {
-    commit("SET_LOADER", true);
-    try {
-      const { data: flightData } = await axios.get("/mocks/flights.json");
-      const flights = flightData.map(flight => new Flight(flight));
-
-      commit("SET_FLIGHTS", flights);
-      commit("SET_LOADER", false);
-      resolve();
-    } catch (error) {
-      console.error(error);
-      commit("SET_LOADER", false);
-      reject(error);
-    }
-  });
+export async function fetchFlights({ commit }, { date, departure, arrival }) {
+  commit("SET_LOADER", true);
+  try {
+    const { data: flightData } = await axios.get("/mocks/flights.json");
+    const flights = flightData.map(flight => new Flight(flight));
+    commit("SET_FLIGHTS", flights);
+    commit("SET_LOADER", false);
+    return;
+  } catch (error) {
+    console.error(error);
+    commit("SET_LOADER", false);
+    throw error;
+  }
 }
 
 /**
@@ -78,24 +75,21 @@ export function fetchFlights({ commit }, { date, departure, arrival }) {
  *    }
  * },
  */
-export function fetchByFlightNumber(
+export async function fetchByFlightNumber(
   { commit },
   { date, departure, arrival, flightNumber }
 ) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      commit("SET_LOADER", true);
-      const { data: flightData } = await axios.get("/mocks/flights.json");
-      const flight = new Flight(
-        flightData.find(flight => flight.flightNumber === flightNumber)
-      );
-
-      commit("SET_LOADER", false);
-      resolve(flight);
-    } catch (error) {
-      console.error(error);
-      commit("SET_LOADER", false);
-      reject(error);
-    }
-  });
+  try {
+    commit("SET_LOADER", true);
+    const { data: flightData } = await axios.get("/mocks/flights.json");
+    const flight = new Flight(
+      flightData.find(flight => flight.flightNumber === flightNumber)
+    );
+    commit("SET_LOADER", false);
+    return flight;
+  } catch (error) {
+    console.error(error);
+    commit("SET_LOADER", false);
+    throw error;
+  }
 }
